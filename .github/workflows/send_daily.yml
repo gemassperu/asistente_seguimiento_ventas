@@ -1,0 +1,44 @@
+name: Send Daily Emails
+
+on:
+  schedule:
+    - cron: "0 14 * * *"   # 14:00 UTC = 09:00 Lima
+  workflow_dispatch:
+
+jobs:
+  send-daily:
+    runs-on: ubuntu-latest
+    env:
+      APP_ENV: prod
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      OPENAI_PROMPT_ID: ${{ secrets.OPENAI_PROMPT_ID }}
+      OPENAI_PROMPT_VERSION: ${{ secrets.OPENAI_PROMPT_VERSION }}
+      OPENAI_PROMPT_ID_DIGEST: ${{ secrets.OPENAI_PROMPT_ID_DIGEST }}
+      OPENAI_PROMPT_VERSION_DIGEST: ${{ secrets.OPENAI_PROMPT_VERSION_DIGEST }}
+      MANAGERS_EMAILS: ${{ secrets.MANAGERS_EMAILS }}
+      GOOGLE_CREDENTIALS_JSON: ${{ secrets.GOOGLE_CREDENTIALS_JSON }}
+      GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON }}
+      GMAIL_SENDER: ${{ secrets.GMAIL_SENDER }}
+      PYTHON_VERSION: ${{ secrets.PYTHON_VERSION }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION || '3.11' }}
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install deps
+        run: pip install --upgrade pip && pip install -r requirements.txt
+
+      - name: Run send_to_employees
+        run: python -m app.jobs.send_daily
