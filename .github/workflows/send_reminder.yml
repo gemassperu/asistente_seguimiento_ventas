@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  send-daily:
+  send-reminder:
     runs-on: ubuntu-latest
     env:
       APP_ENV: prod
@@ -15,8 +15,8 @@ jobs:
       SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      OPENAI_PROMPT_ID: ${{ secrets.OPENAI_PROMPT_ID }}
-      OPENAI_PROMPT_VERSION: ${{ secrets.OPENAI_PROMPT_VERSION }}
+      OPEN_AI_PROMPT_ID: ${{ secrets.OPEN_AI_PROMPT_ID }}
+      OPEN_AI_PROMPT_VERSION: ${{ secrets.OPEN_AI_PROMPT_VERSION }}
       SUMMARY_PROMPT_ID: ${{ secrets.SUMMARY_PROMPT_ID }}
       SUMMARY_PROMPT_VERSION: ${{ secrets.SUMMARY_PROMPT_VERSION }}
       GOOGLE_CREDENTIALS_JSON: ${{ secrets.GOOGLE_CREDENTIALS_JSON }}
