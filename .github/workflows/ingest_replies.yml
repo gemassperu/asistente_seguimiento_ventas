@@ -2,7 +2,7 @@ name: Ingest Replies
 
 on:
   schedule:
-    - cron: "0 16 * * *"   # 16:00 UTC = 11:00 Lima
+    - cron: "0 16 * * 1-6"  # 16:00 UTC = 11:00 Lima
   workflow_dispatch:
 
 jobs:

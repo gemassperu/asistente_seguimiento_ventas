@@ -1,7 +1,7 @@
 name: Send Summary Email
 on:
   schedule:
-    - cron: "0 17 * * *"   # 17:00 UTC = 12:00 Lima
+    - cron: "0 17 * * 1-6"   # 17:00 UTC = 12:00 Lima
   workflow_dispatch:
 
 jobs:

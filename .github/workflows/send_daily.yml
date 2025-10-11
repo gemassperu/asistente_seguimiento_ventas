@@ -2,7 +2,7 @@ name: Send Daily Emails
 
 on:
   schedule:
-    - cron: "0 14 * * *"   # 14:00 UTC = 09:00 Lima
+    - cron: "0 14 * *  1-6"   # 14:00 UTC = 09:00 Lima
   workflow_dispatch:
 
 jobs:
