@@ -1,8 +1,8 @@
-name: Send Daily Emails
+name: Ingest Replies
 
 on:
   schedule:
-    - cron: "0 14 * * *"   # 14:00 UTC = 09:00 Lima
+    - cron: "0 16 * * *"   # 16:00 UTC = 11:00 Lima
   workflow_dispatch:
 
 jobs:
@@ -39,5 +39,5 @@ jobs:
       - name: Install deps
         run: pip install --upgrade pip && pip install -r requirements.txt
 
-      - name: Run send_daily
-        run: python -m app.jobs.send_daily
+      - name: Run ingest_replies
+        run: python -m app.jobs.ingest_replies

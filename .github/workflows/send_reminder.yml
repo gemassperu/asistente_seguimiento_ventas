@@ -1,8 +1,9 @@
-name: Send Daily Emails
+
+name: Send Reminder Emails
 
 on:
   schedule:
-    - cron: "0 14 * * *"   # 14:00 UTC = 09:00 Lima
+    - cron: "0 15 * * *"   # 15:00 UTC = 10:00 Lima
   workflow_dispatch:
 
 jobs:
@@ -39,5 +40,5 @@ jobs:
       - name: Install deps
         run: pip install --upgrade pip && pip install -r requirements.txt
 
-      - name: Run send_daily
-        run: python -m app.jobs.send_daily
+      - name: Run send_reminder
+        run: python -m app.jobs.send_reminder
