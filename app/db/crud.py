@@ -156,9 +156,7 @@ def replace_tasks(client, *, checkin_id: str, tasks: Iterable[dict]) -> list:
 
     if tasks == []:
         return []
-    # Borrado por checkin_id
-    _ = client.table("tasks").delete().eq("checkin_id", checkin_id).neq("status","completado").execute()
-
+    
     created = []
     batch: List[Dict[str, Any]] = []
 
@@ -190,6 +188,7 @@ def replace_tasks(client, *, checkin_id: str, tasks: Iterable[dict]) -> list:
 
     if batch:
         print("batch being inserted")
+        _ = client.table("tasks").delete().eq("title", title).neq("status","completado").execute()
         res = client.table("tasks").insert(batch, returning="representation").execute()
         created = res.data or []
 

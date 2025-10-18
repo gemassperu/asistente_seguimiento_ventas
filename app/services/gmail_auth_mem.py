@@ -10,6 +10,8 @@ from googleapiclient.discovery import build
 from google.auth.transport.requests import Request
 from dotenv import load_dotenv
 load_dotenv()
+from google.auth.exceptions import RefreshError
+
 
 SCOPES = [
     "https://www.googleapis.com/auth/gmail.send",
@@ -39,6 +41,7 @@ def _creds_from_token_json(token_json_str: str) -> Credentials:
     data = json.loads(token_json_str)
     return Credentials.from_authorized_user_info(data, scopes=SCOPES)
 
+
 def get_gmail_service_in_memory(
     *,
     credentials_json_env: str = "GOOGLE_CREDENTIALS_JSON",
@@ -57,7 +60,7 @@ def get_gmail_service_in_memory(
             {"installed": client_info["installed"]} if "installed" in client_info else client_info,
             SCOPES
         )
-        creds = flow.run_local_server(port=0)  # abre navegador local
+        creds = flow.run_local_server(port=0)
         new_token_json = creds.to_json()
         service = build("gmail", "v1", credentials=creds, cache_discovery=False)
         return {"service": service, "token_json": new_token_json}
@@ -68,11 +71,24 @@ def get_gmail_service_in_memory(
     updated_token_json: t.Optional[str] = None
     if not creds.valid:
         if creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-            updated_token_json = creds.to_json()
+            try:
+                creds.refresh(Request())           # intenta refresh en memoria
+                updated_token_json = creds.to_json()
+            except RefreshError as e:
+                if force_oauth_if_missing_token:
+                    flow = InstalledAppFlow.from_client_config(
+                        {"installed": client_info["installed"]} if "installed" in client_info else client_info,
+                        SCOPES
+                    )
+                    creds = flow.run_local_server(port=0)  # reautoriza en local
+                    updated_token_json = creds.to_json()
+                else:
+                    raise RuntimeError(
+                        "El refresh token es inválido o fue revocado. "
+                        "Genera un nuevo GOOGLE_TOKEN_JSON en local (OAuth) y vuelve a ejecutar."
+                    ) from e
         else:
             if force_oauth_if_missing_token:
-                # Re-autorizar (local)
                 flow = InstalledAppFlow.from_client_config(
                     {"installed": client_info["installed"]} if "installed" in client_info else client_info,
                     SCOPES
@@ -80,7 +96,9 @@ def get_gmail_service_in_memory(
                 creds = flow.run_local_server(port=0)
                 updated_token_json = creds.to_json()
             else:
-                raise RuntimeError("Token inválido y sin refresh_token. Reautoriza el acceso (OAuth) en local.")
+                raise RuntimeError(
+                    "Token inválido y sin refresh_token. Reautoriza en local para obtener un nuevo token."
+                )
 
     service = build("gmail", "v1", credentials=creds, cache_discovery=False)
     result: GmailAuthResult = {"service": service}

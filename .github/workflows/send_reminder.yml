@@ -40,6 +40,7 @@ jobs:
 
       - name: Install deps
         run: pip install --upgrade pip && pip install -r requirements.txt
-
+      - name: Run ingest_replies
+        run: python -m app.jobs.ingest_replies
       - name: Run send_reminder
         run: python -m app.jobs.send_reminder
