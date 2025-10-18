@@ -16,7 +16,7 @@ def main():
         subject = f"Resumen diario - Tareas para {today:%Y-%m-%d}"
         text_body = extract_tasks(str(tasks))
         try:
-            sent = send_email("enzo.ip.98@gmail.com", subject, text_body)
+            sent = send_email("gerencia@atlantisinmobiliaria.com", subject, text_body)
         except:
             print(f"Error enviando reporte de gerencia")
 if __name__ == "__main__":

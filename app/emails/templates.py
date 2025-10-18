@@ -24,11 +24,11 @@ def _render_task_yaml(t: dict) -> str:
         progress = 0
 
     return dedent(f"""\
-      - title: {title}
-        status: {status}
-        progress: {progress}
-        next_steps: {next_steps}
-        blocker: {blocker}""")
+      - Titulo: {title}
+      - Estado: {status}
+      - Progreso: {progress}
+      - Siguientes pasos: {next_steps}
+      - Bloqueantes: {blocker}""")
 
 # =========
 # 09:00 - Seguimiento diario
@@ -39,17 +39,18 @@ def body_daily_text(d: date, employee_name: str, tasks) -> str:
     if not tasks:
         return f"""Hola {employee_name},
 
-Por favor responde con este bloque (puedes editarlo). Si lo prefieres, responde en texto libre;
-nuestro sistema interpretará el contenido automáticamente:
+Por favor responde a este correo con la actualización de tus actividades.
 
-empleado: {employee_name}
-fecha: {_fmt(d)}
-tareas:
-- title: <tarea>
-    status: pendiente|en_progreso|completado
-    progress: 0
-    next_steps: <pasos>
-    blocker: ninguno
+Aquí te dejo un modelo para que puedas usarlo como referencia
+
+Colaborador: {employee_name}
+Fecha: {_fmt(d)}
+Tareas:
+- Titulo: <tarea>
+- Estado: pendiente|en_progreso|completado
+- Progreso: 0
+- Siguientes pasos: <pasos>
+- Bloqueantes: ninguno
 
 ¡Gracias!
 """
@@ -63,19 +64,19 @@ tareas:
     return f"""Hola {employee_name},
 
 Estas son tus tareas pendientes/en progreso al { _fmt(d) }.
-Por favor responde actualizando cada una (status, progress, next_steps y blocker) y agrega cualquier tarea nueva.
+Por favor responde actualizando cada una (Titulo, Estado, Siguientes pasos y Bloqueantes) y agrega cualquier tarea nueva.
 
-empleado: {employee_name}
-fecha: {_fmt(d)}
-tareas_existentes:
+Colaborador: {employee_name}
+Fecha: {_fmt(d)}
+Tareas existentes:
 {rendered}
 
 tareas_nuevas:
-- title: <tarea>
-    status: pendiente|en_progreso|completado
-    progress: 0
-    next_steps: <pasos>
-    blocker: ninguno
+- Titulo: <tarea>
+- Estado: pendiente|en_progreso|completado
+- Progreso: 0
+- Siguientes pasos: <pasos>
+- Bloqueantes: ninguno
 
 ¡Gracias!
 """
@@ -87,8 +88,7 @@ tareas_nuevas:
 def body_reminder_text(employee_name: str) -> str:
     return f"""Hola {employee_name},
 
-Recordatorio amable: aún no recibimos tu actualización de hoy.
-¿Nos ayudas respondiendo a este hilo? ¡Gracias!
+Esto es un recordatorio amable de que todavía no has respondido al correo de seguimiento diario, recuerda hacerlo antes de las 6 pm.
 """
 
 # =========
