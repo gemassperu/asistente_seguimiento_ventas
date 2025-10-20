@@ -174,7 +174,7 @@ def replace_tasks(client, *, checkin_id: str, tasks: Iterable[dict]) -> list:
             progress = max(0, min(100, progress))
         else:
             progress = None
-        res = client.table("tasks").select("tasks").eq("title", title).eq("checkin_id",checkin_id).execute()
+        res = client.table("tasks").select("*").eq("title", title).eq("checkin_id",checkin_id).execute()
         if res.data[0].get("progress") == progress:
             observation = "No se progresó en la tarea desde el último avance"
         batch.append(
