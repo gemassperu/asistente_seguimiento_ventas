@@ -174,7 +174,9 @@ def replace_tasks(client, *, checkin_id: str, tasks: Iterable[dict]) -> list:
             progress = max(0, min(100, progress))
         else:
             progress = None
-
+        res = client.table("tasks").select("tasks").eq("title", title).eq("checkin_id",checkin_id).execute()
+        if res.data[0].get("progress") == progress:
+            observation = "No se progresó en la tarea desde el último avance"
         batch.append(
             {   
                 "checkin_id": checkin_id,
@@ -183,30 +185,14 @@ def replace_tasks(client, *, checkin_id: str, tasks: Iterable[dict]) -> list:
                 "progress": progress,
                 "next_steps": t.get("next_steps"),
                 "blocker": t.get("blocker"),
+                "observation": observation
             }
         )
 
     if batch:
         print("batch being inserted")
-        _ = client.table("tasks").delete().eq("title", title).neq("status","completado").execute()
+        _ = client.table("tasks").delete().eq("title", title).eq("checkin_id",checkin_id).neq("status","completado").execute()
         res = client.table("tasks").insert(batch, returning="representation").execute()
         created = res.data or []
 
     return created
-
-# --------------------------
-# Digest / Resumen
-# --------------------------
-def _count_checkins(client, where: List[Tuple[str, str, Any]]) -> int:
-    q = client.table("checkins").select("id", count="exact")  # usa header Prefer: count=exact
-    for col, op, val in where:
-        if op == "eq":
-            q = q.eq(col, val)
-        elif op == "is_null":
-            q = q.is_(col, "null")
-        elif op == "not_null":
-            q = q.not_.is_(col, "null")
-        else:
-            raise ValueError(f"Operador no soportado: {op}")
-    res = q.execute()
-    return int(res.count or 0)
