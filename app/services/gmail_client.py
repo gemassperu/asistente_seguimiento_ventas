@@ -25,7 +25,7 @@ def _service() -> any:
     new_token = res.get("token_json")
     if new_token and APP_ENV == "local":
         print("[GMAIL] token actualizado. Copia este JSON a GOOGLE_TOKEN_JSON:")
-        print(new_token)
+        #print(new_token)
 
     return res["service"]
 

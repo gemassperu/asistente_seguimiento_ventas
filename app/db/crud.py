@@ -174,9 +174,16 @@ def replace_tasks(client, *, checkin_id: str, tasks: Iterable[dict]) -> list:
             progress = max(0, min(100, progress))
         else:
             progress = None
-        res = client.table("tasks").select("*").eq("title", title).eq("checkin_id",checkin_id).execute()
-        if res.data[0].get("progress") == progress:
-            observation = "No se progresó en la tarea desde el último avance"
+        res = (client.table("tasks").select("*").eq("title", title).execute()).data or []
+        if not res :
+            observation = ""
+            id = 0
+        elif res[0].get("progress") == progress:
+            observation = "No se progresó en la tarea desde el último check-in"
+            id =  res[0].get("id")
+        else:
+            observation = ""
+            id = res[0].get("id")
         batch.append(
             {   
                 "checkin_id": checkin_id,
@@ -188,10 +195,9 @@ def replace_tasks(client, *, checkin_id: str, tasks: Iterable[dict]) -> list:
                 "observation": observation
             }
         )
+        _ = client.table("tasks").delete().eq("id",id).execute()
 
     if batch:
-        print("batch being inserted")
-        _ = client.table("tasks").delete().eq("title", title).eq("checkin_id",checkin_id).neq("status","completado").execute()
         res = client.table("tasks").insert(batch, returning="representation").execute()
         created = res.data or []
 
