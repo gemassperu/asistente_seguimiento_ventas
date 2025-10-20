@@ -102,7 +102,7 @@ def get_today_tasks(client):
     today = date.today()
     res = (
         client.table("checkins")
-        .select("date, employee:employee_id(name), tasks(title,status,progress,blocker)")
+        .select("date, employee:employee_id(name), tasks(title,status,progress,blocker,observation)")
         .eq("date", str(today))
         .execute()
     )
