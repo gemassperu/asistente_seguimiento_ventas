@@ -30,11 +30,11 @@ def main():
                 print(f"Saltado (sin email): id={emp_id} nombre={emp_name}")
                 skipped += 1
                 continue
-
+            print("emp id ", emp_id)
             subject = f"Seguimiento diario - {today:%Y-%m-%d} — {emp_name}"
             tasks = get_pending_tasks_for_employee(db,emp_id)
             body = render_daily(emp_name, today,tasks)
-
+            print(f"tasks for {emp_name} ", tasks)
             try:
                 sent = send_email(emp_email, subject, body)
                 chk = upsert_checkin(

@@ -92,6 +92,7 @@ def get_pending_tasks_for_employee(client,employee_id):
         client.table("tasks")
         .select("title,status,progress,next_steps,blocker, checkins:checkin_id(employee_id)")
         .eq("checkins.employee_id", employee_id)
+        .not_.is_("checkins", "null")
         .neq("status","completado")
         .execute()
     )
