@@ -100,11 +100,10 @@ def get_pending_tasks_for_employee(client,employee_id):
     return rows
 
 def get_today_tasks(client):
-    today = date.today()
     res = (
-        client.table("checkins")
-        .select("date, employee:employee_id(name), tasks(title,status,progress,blocker,observation)")
-        .eq("date", str(today))
+        client.table("tasks")
+        .select("title,status,progress,next_steps,blocker, employee:employee_id(name)")
+        .eq("status", "null")
         .execute()
     )
     rows = res.data or []
@@ -175,7 +174,7 @@ def replace_tasks(client, *, checkin_id: str, tasks: Iterable[dict]) -> list:
             progress = max(0, min(100, progress))
         else:
             progress = None
-        res = (client.table("tasks").select("*").eq("title", title).execute()).data or []
+        res = (client.table("tasks").select("*").eq("title", title).neq("checkin_id",checkin_id).execute()).data or []
         if not res :
             observation = ""
             id = 0
