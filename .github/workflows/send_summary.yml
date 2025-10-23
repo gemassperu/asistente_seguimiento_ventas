@@ -38,6 +38,7 @@ jobs:
 
       - name: Install deps
         run: pip install --upgrade pip && pip install -r requirements.txt
-
+      - name: Update Summary
+        run: python -m app.jobs.update_summary
       - name: Run send_digest
         run: python -m app.jobs.send_digest
