@@ -100,14 +100,34 @@ def get_pending_tasks_for_employee(client,employee_id):
     return rows
 
 def get_today_tasks(client):
-    res = (
+    today = datetime.now().date()
+    q1 = (
         client.table("tasks")
-        .select("title,status,progress,next_steps,blocker, employee:employee_id(name)")
-        .eq("status", "null")
+        .select(
+            "id,title,status,progress,next_steps,blocker,"
+            "checkins:checkin_id(date,employee:employee_id(name))"
+        )
+        .in_("status", ["pendiente", "en_progreso"])
         .execute()
     )
-    rows = res.data or []
-    return rows
+    rows1 = q1.data or []
+    
+    q2 = (
+        client.table("tasks")
+        .select(
+            "id,title,status,progress,next_steps,blocker,"
+            "checkins:checkin_id(date,employee:employee_id(name))"
+        )
+        .eq("status", "completado")
+        .eq("checkins.date",today)
+        .execute()
+    )
+    rows2 = q2.data or []
+    by_id = {r["id"]: r for r in rows1}
+    for r in rows2:
+        by_id.setdefault(r["id"], r)
+
+    return list(by_id.values())
 
 def get_today_checkins_by_thread(client, thread_id: str) -> any:
     today = date.today()
